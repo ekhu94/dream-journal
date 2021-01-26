@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 require_relative '../config/environment'
 
-puts CLI.new.log_in
+puts CLI.new.create_entry
 
