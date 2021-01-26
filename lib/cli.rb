@@ -15,7 +15,11 @@ class CLI
         puts "Please enter your name:"
         name = gets.chomp
         curr_user = find_or_create_by_name(name)
-        @users << curr_user.id
+        @users << curr_user
+    end
+
+    def user
+        @users[0]
     end
 
     def find_or_create_by_name(name)
@@ -28,9 +32,9 @@ class CLI
             choice = gets.chomp
             case choice
             when "new"
-            
+                create_entry
             when "list"
-            
+                select_list
             when "update"
 
             when "delete"
@@ -44,7 +48,7 @@ class CLI
 
     def main_menu
     
-    puts "What do you like to do?"
+    puts "What would you like to do?"
     puts "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
     puts "[new] Make a new dream entry"
     puts "[list] List past entries"
@@ -125,18 +129,40 @@ class CLI
         dream_params = {}
         dream_params[:category] = select_category
         dream_params[:remembrance] = get_remembrance.to_i
-        dream_params[:person_id] = @users[0]
+        dream_params[:person_id] = self.user.id
         new_dream = Dream.create(dream_params)
 
         entry_params = {}
-        entry_params[:date] = DateTime.now
+        entry_params[:date] = Date.today
         entry_params[:description] = get_description
         entry_params[:hours_slept] = hours_slept?
         entry_params[:recurring] = recurring?
         entry_params[:dream_id] = new_dream.id
         new_entry = Entry.create(entry_params)
-        binding.pry
-        new_dream
-        new_entry
+        puts "Thank you! Your entry has been successfully saved."
+    end
+
+    def list_menu
+        puts "List which entries?"
+        puts "*-*-*-*-*-*-*-*-*-*-*"
+        puts "[a] All dreams"
+        puts "[1] Normal dreams"
+        puts "[2] Nightmares"
+        puts "[3] Lucid dreams"
+        puts "[4] False awakenings"
+        puts "[5] Recurring dreams"
+        puts "[6] Dreams from minimal sleep"
+        puts "*-*-*-*-*-*-*-*-*-*-*"
+    end
+
+    def select_list
+        loop do
+            list_menu
+            choice = gets.chomp
+            case choice
+            when "a"
+                puts self.user.entries
+            end
+        end
     end
 end
