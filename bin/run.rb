@@ -1,5 +1,5 @@
+#!/usr/bin/env ruby
 require_relative '../config/environment'
-# require_relative '../lb/cli.rb'
 
-puts "HELP!"
+puts CLI.new.log_in
 

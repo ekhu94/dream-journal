@@ -1,15 +1,18 @@
-# require_relative '../config/environment'
-# require_all '../app/models'
+class CLI
+    def welcome
+        puts "*--*--*--*--*-*-*--*--*--*--*"
+        puts "Welcome to the Dream Journal."
+        puts "*--*--*--*--*-*-*--*--*--*--*"
+    end
 
-# class CLI
-#     def welcome
-#         puts "Welcome to your Dream Journal."
-#     end
+    def log_in
+        welcome
+        puts "Please enter your name:"
+        name = gets.chomp
+        find_or_create_by_name(name)
+    end
 
-#     def log_in
-#         welcome
-#         puts "Please enter your name:"
-#         name = gets.chomp
-#         "Hello #{name}"
-#     end
-# end
+    def find_or_create_by_name(name)
+        Person.find_by(name: name) || Person.create(name: name)
+    end
+end
