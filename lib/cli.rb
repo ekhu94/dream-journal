@@ -139,6 +139,8 @@ class CLI
         entry_params[:recurring] = recurring?
         entry_params[:dream_id] = new_dream.id
         new_entry = Entry.create(entry_params)
+        new_dream.save
+        binding.pry
         puts "Thank you! Your entry has been successfully saved."
     end
 
@@ -152,7 +154,19 @@ class CLI
         puts "[4] False awakenings"
         puts "[5] Recurring dreams"
         puts "[6] Dreams from minimal sleep"
+        puts "[q] Back to main menu"
         puts "*-*-*-*-*-*-*-*-*-*-*"
+    end
+
+    def print_entries(entries)
+        entries.each do |entry|
+            puts "Date: #{entry[:date].strftime("%m-%d-%Y")}"
+            puts "Type: #{entry.dream[:category]}"
+            puts "Dream: #{entry[:description]}"
+            puts "Recurring: #{entry[:recurring] ? "Yes" : "No"}"
+            puts "Hours slept: #{entry[:hours_slept]}"
+            puts
+        end
     end
 
     def select_list
@@ -161,7 +175,8 @@ class CLI
             choice = gets.chomp
             case choice
             when "a"
-                puts self.user.entries
+                print_entries(self.user.entries)
+                break
             end
         end
     end
