@@ -15,13 +15,12 @@ ActiveRecord::Schema.define(version: 2021_01_26_134724) do
   create_table "dreams", force: :cascade do |t|
     t.string "category"
     t.integer "remembrance"
-    t.boolean "recurring"
     t.integer "person_id"
   end
 
   create_table "entries", force: :cascade do |t|
     t.datetime "date"
-    t.text "subject"
+    t.text "description"
     t.integer "hours_slept"
     t.boolean "recurring"
     t.integer "dream_id"
