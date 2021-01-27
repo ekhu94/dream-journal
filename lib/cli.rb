@@ -24,7 +24,7 @@ class CLI
     end
 
     def find_or_create_by_name(name)
-        Person.find_by(name: name) || Person.create(name: name)
+        User.find_by(name: name) || User.create(name: name)
     end
 
     def action
@@ -143,7 +143,7 @@ class CLI
     def create_entry
         dream_params = {}
         dream_params[:hours_slept] = hours_slept?
-        dream_params[:person_id] = self.user.id
+        dream_params[:user_id] = self.user.id
         new_dream = Dream.create(dream_params)
 
         num = num_entries
@@ -159,6 +159,7 @@ class CLI
             new_entry = Entry.create(entry_params)
             new_dream.save
         end
+        puts
         puts "Thank you! Your entry has been successfully saved."
         puts
     end
@@ -169,11 +170,11 @@ class CLI
         puts "*-*-*-*-*-*-*-*-*-*-*-*-*"
         puts "[a] All dreams"
         puts "[1] By category"
-        puts "[2] Recurring"
-        puts "[3] By date"
+        puts "[2] Recurring" 
+        puts "[3] By date" #todo
         puts "[4] Had minimal sleep"
-        puts "[5] Had sufficient sleep"
-        puts "[q] Back to main menu"
+        puts "[5] Had sufficient sleep" #todo
+        puts "[q] Back to main menu" #todo
         puts "*-*-*-*-*-*-*-*-*-*-*-*-*"
         puts
     end
@@ -189,6 +190,11 @@ class CLI
             puts "Hours slept: #{entry.dream[:hours_slept]}"
             puts
         end
+    end
+
+    def get_entries_by_hours_slept(min, max=100)
+        dreams_arr = Dream.where("hours_slept < ? AND hours_slept >= ?", max, min)
+        dreams_arr.map { |dream| dream.entries }.flatten
     end
 
     def select_list
@@ -211,6 +217,9 @@ class CLI
                 break
             when "2"
                 print_entries(self.user.entries.where(recurring: true))
+                break
+            when "4"
+                print_entries(get_entries_by_hours_slept(0, 4))
                 break
             end
         end

@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_26_134724) do
+ActiveRecord::Schema.define(version: 2021_01_27_012054) do
 
   create_table "dreams", force: :cascade do |t|
     t.integer "hours_slept"
-    t.integer "person_id"
+    t.integer "user_id"
   end
 
   create_table "entries", force: :cascade do |t|
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2021_01_26_134724) do
     t.integer "dream_id"
   end
 
-  create_table "people", force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "name"
   end
 
