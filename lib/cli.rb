@@ -38,7 +38,7 @@ class CLI
                 delete_entry
             when "exit"
                 puts
-                puts "Goodbye! Have a good night's sleep :)"
+                puts "Goodbye. Hope you sleep well!"
                 puts
                 exit
             end
