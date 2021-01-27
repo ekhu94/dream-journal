@@ -41,7 +41,7 @@ class CLI
             when "update"
 
             when "delete"
-
+                delete_entry
             when "exit"
                 puts
                 puts "Goodbye! Have a good night's sleep :)"
@@ -52,9 +52,8 @@ class CLI
     end
 
     def main_menu
-    
-        puts "What would you like to do?"
         puts
+        puts "What would you like to do?"
         puts "*--*--*--*--*--*--*--*--*--*--*"
         puts "[new] Make a new dream entry"
         puts "[list] List past entries"
@@ -63,7 +62,6 @@ class CLI
         puts "[exit] Exit program"
         puts "*--*--*--*--*--*--*--*--*--*--*"
         puts
-
     end
 
     def category_menu
@@ -206,15 +204,91 @@ class CLI
     end
 
     def delete_menu
+        puts
+        puts "Select a method for deleting"
+        puts "*--*--*--*--*--*--*--*--*--*"
+        puts "[id] By dream ID"
+        puts "[all] All dreams"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*--*"
+        puts
+    end
 
+    def delete_by_id
+        print_dreams(self.user.dreams)
+        puts
+        puts "Type in the ID of the dream you would like to delete."
+        selected_id = gets.chomp
+        while !/\A\d+\z/.match(selected_id) || !self.user.dreams.find_by(id: selected_id.to_i)
+            puts "Please enter a valid dream ID"
+            selected_id = gets.chomp
+        end
+        puts
+        puts "Are you sure you want to delete this dream and all its entries?"
+        loop do
+            confirm = gets.chomp
+            case confirm
+            when "yes", "y"
+                self.user.dreams.destroy_by(id: selected_id.to_i)
+                puts "Dream ##{selected_id.to_i} has been deleted!"
+                self.user.save
+                break
+            when "no", "n"
+                break
+            end
+        end
+    end
+
+    def delete_by_all
+        puts
+        puts "Are you sure you want to delete all entries? THIS CANNOT BE UNDONE!"
+        loop do
+            confirm = gets.chomp
+            case confirm
+            when "yes", "y"
+                Entry.destroy_by(user_id: self.user.id)
+                puts "All of #{self.user.name}'s entries have been deleted!"
+                self.user.save
+                break
+            when "no", "n"
+                break
+            end
+        end
+    end
+
+    def delete_entry
+        delete_menu
+        choice = gets.chomp
+        loop do
+            case choice
+            when "id"
+                delete_by_id
+                break
+            when "all"
+                delete_by_all
+                break
+            when "q"
+                break
+            end
+        end
+    end
+
+    def print_dreams(dreams)
+        puts
+        puts "*--*--*--* DREAMS LIST *--*--*--*"
+        puts
+        dreams.each do |dream|
+            puts
+            puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
+            print_entries(dream.entries)
+            puts
+        end
+        puts "*--*--*--*--*--*--*--*--*--*--*--*"
     end
 
     def print_entries(entries)
-        puts
-        puts "*--*--* ENTRIES LIST *--*--*"
         entries.each do |entry|
             puts
-            puts "ID: #{entry[:id]}"
             puts "Date: #{entry[:date].strftime('%H:%M %B %e, %Y')}"
             puts "Type: #{entry[:category]}"
             puts "Discription: #{entry[:description]}"
@@ -223,12 +297,10 @@ class CLI
             puts "I remembered #{entry[:remembrance]}% of this dream."
             puts
         end
-        puts "*--*--*--*--*--*--*--*--*--*"
-        puts
     end
 
     def get_entries_by_hours_slept(min, max=100)
-        dreams_arr = Dream.where("hours_slept < ? AND hours_slept >= ?", max, min)
+        dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", max, min)
         dreams_arr.map { |dream| dream.entries }.flatten
     end
 
@@ -244,7 +316,7 @@ class CLI
             choice = gets.chomp
             case choice
             when "a"
-                print_entries(self.user.entries)
+                print_dreams(self.user.dreams)
                 break
             when "1"
                 picked_category = select_category
