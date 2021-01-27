@@ -205,6 +205,10 @@ class CLI
         puts
     end
 
+    def delete_menu
+
+    end
+
     def print_entries(entries)
         puts
         puts "*--*--* ENTRIES LIST *--*--*"
@@ -250,7 +254,12 @@ class CLI
                 print_entries(self.user.entries.where(recurring: true))
                 break
             when "4"
-                print_entries(get_entries_by_hours_slept(0, 4))
+                print_entries(get_entries_by_hours_slept(0, 5))
+                break
+            when "5"
+                print_entries(get_entries_by_hours_slept(5))
+                break
+            when "q"
                 break
             end
         end
