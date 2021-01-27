@@ -77,8 +77,8 @@ class CLI
         puts
     end
 
-    def select_category(i)
-        num = ""
+    def print_entry_num(i)
+    num = ""
         case i
         when 1
             num = "1st"
@@ -91,6 +91,15 @@ class CLI
         end
         puts
         puts "Select a category for the #{num} entry:"
+    end
+
+    def select_category(i=nil)
+        if i.nil?
+            puts
+            puts "Select a category"
+        else
+            print_entry_num(i)
+        end
         loop do
             category_menu
             choice = gets.chomp
