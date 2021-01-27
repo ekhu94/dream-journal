@@ -179,7 +179,6 @@ class CLI
             entry_params[:recurring] = recurring?
             entry_params[:dream_id] = new_dream.id
             new_entry = Entry.create(entry_params)
-            new_dream.save
             i += 1
         end
         self.user.save
@@ -290,7 +289,7 @@ class CLI
                     print_entries(entries)
                     puts
                 else
-                    puts "No dreams were found matching that description."
+                    puts "No dreams were found \nmatching that description."
                     puts
                 end
             end
