@@ -17,6 +17,8 @@ class CLI
         name = gets.chomp
         curr_user = find_or_create_by_name(name)
         @users << curr_user
+        puts
+        puts "Welcome #{self.user.name}."
     end
 
     def user
@@ -42,7 +44,8 @@ class CLI
 
             when "exit"
                 puts
-                puts "Get a good night's sleep :)"
+                puts "Goodbye! Have a good night's sleep :)"
+                puts
                 exit
             end
         end
@@ -50,33 +53,44 @@ class CLI
 
     def main_menu
     
-        puts
         puts "What would you like to do?"
-        puts "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+        puts
+        puts "*--*--*--*--*--*--*--*--*--*--*"
         puts "[new] Make a new dream entry"
         puts "[list] List past entries"
         puts "[update] Update a dream entry"
         puts "[delete] Delete dream entry"
         puts "[exit] Exit program"
-        puts "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+        puts "*--*--*--*--*--*--*--*--*--*--*"
         puts
 
     end
 
     def category_menu
         puts
-        puts "*-*-*-*-*-*-*-*-*-*-*"
+        puts "*--*--*--*--*--*--*--*"
         puts "[1] Normal Dream"
         puts "[2] Nightmare"
         puts "[3] Lucid Dream"
         puts "[4] False Awakening"
-        puts "*-*-*-*-*-*-*-*-*-*-*"
+        puts "*--*--*--*--*--*--*--*"
         puts
     end
 
-    def select_category
-        puts "Select a category"
+    def select_category(i)
+        num = ""
+        case i
+        when 1
+            num = "1st"
+        when 2
+            num = "2nd"
+        when 3
+            num = "3rd"
+        else
+            num = i.to_s + "th"
+        end
         puts
+        puts "Select a category for the #{num} entry:"
         loop do
             category_menu
             choice = gets.chomp
@@ -90,6 +104,7 @@ class CLI
             when "4"
                 return "False Awakening"
             else
+                puts
                 puts "Please select a valid category"
             end
         end
@@ -97,7 +112,7 @@ class CLI
 
     def get_remembrance
         loop do
-            puts "How much do you remember? (Out of 100)"
+            puts "How much do you remember? (% out of 100)"
             remembrance = gets.chomp
             return remembrance.to_i if /\A\d+\z/.match(remembrance) && remembrance.to_i <= 100
         end
@@ -147,18 +162,20 @@ class CLI
         new_dream = Dream.create(dream_params)
 
         num = num_entries
-
-        num.times do
+        i = 0
+        while i < num do
             entry_params = {}
             entry_params[:date] = DateTime.now
-            entry_params[:category] = select_category
+            entry_params[:category] = select_category(i + 1)
             entry_params[:remembrance] = get_remembrance
             entry_params[:description] = get_description
             entry_params[:recurring] = recurring?
             entry_params[:dream_id] = new_dream.id
             new_entry = Entry.create(entry_params)
             new_dream.save
+            i += 1
         end
+        self.user.save
         puts
         puts "Thank you! Your entry has been successfully saved."
         puts
@@ -167,7 +184,7 @@ class CLI
     def list_menu
         puts
         puts "List which entries?"
-        puts "*-*-*-*-*-*-*-*-*-*-*-*-*"
+        puts "*--*--*--*--*--*--*--*--*"
         puts "[a] All dreams"
         puts "[1] By category"
         puts "[2] Recurring" 
@@ -175,21 +192,26 @@ class CLI
         puts "[4] Had minimal sleep"
         puts "[5] Had sufficient sleep" #todo
         puts "[q] Back to main menu" #todo
-        puts "*-*-*-*-*-*-*-*-*-*-*-*-*"
+        puts "*--*--*--*--*--*--*--*--*"
         puts
     end
 
     def print_entries(entries)
+        puts
+        puts "*--*--* ENTRIES LIST *--*--*"
         entries.each do |entry|
             puts
             puts "ID: #{entry[:id]}"
             puts "Date: #{entry[:date].strftime('%H:%M %B %e, %Y')}"
             puts "Type: #{entry[:category]}"
-            puts "Dream: #{entry[:description]}"
+            puts "Discription: #{entry[:description]}"
             puts "Recurring: #{entry[:recurring] ? "Yes" : "No"}"
             puts "Hours slept: #{entry.dream[:hours_slept]}"
+            puts "I remembered #{entry[:remembrance]}% of this dream."
             puts
         end
+        puts "*--*--*--*--*--*--*--*--*--*"
+        puts
     end
 
     def get_entries_by_hours_slept(min, max=100)
