@@ -38,7 +38,7 @@ class CLI
                 delete_entry
             when "exit"
                 puts
-                puts "Goodbye. Hope you sleep well!"
+                puts "Goodbye #{self.user.name}. Hope you sleep well!"
                 puts
                 exit
             end
@@ -64,9 +64,9 @@ class CLI
             entry_params[:recurring] = recurring?
             entry_params[:dream_id] = new_dream.id
             new_entry = Entry.create(entry_params)
+            new_dream.save
             i += 1
         end
-        self.user.save
         puts
         puts "Thank you! Your entry has been successfully saved."
         puts
@@ -405,10 +405,14 @@ class CLI
             confirm = gets.chomp
             case confirm
             when "yes", "y"
-                Entry.destroy_by(user_id: self.user.id)
+                self.user.dreams.each do |dream|
+                    dream.entries.each do |entry|
+                        entry.destroy
+                    end
+                    dream.destroy
+                end
                 puts
                 puts "All of #{self.user.name}'s entries have been deleted!"
-                self.user.save
                 break
             when "no", "n"
                 break
