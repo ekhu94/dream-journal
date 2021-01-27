@@ -342,12 +342,12 @@ class CLI
             when "3"
                 
             when "4"
-                entries = get_entries_by_hours_slept(0, 5)
-                print_dreams(self.user.dreams, entries)
+                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 5, 0)
+                print_dreams(dreams_arr)
                 break
             when "5"
-                entries = get_entries_by_hours_slept(5, 20)
-                print_entries(self.user.dreams, entries)
+                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 20, 5)
+                print_dreams(dreams_arr)
                 break
             when "q"
                 break
