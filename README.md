@@ -1,39 +1,28 @@
-# Module One Final Project Guidelines
 
-Congratulations, you're at the end of module one! You've worked crazy hard to get here and have learned a ton.
+# Dream Journal
+Dream Journal is a command line application that tracks a user's nightly dreams and patterns of those dreams. 
+<!-- ## Installation
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+```bash
+pip install foobar
+```
+## Usage
+```python
+import foobar
+foobar.pluralize('word') # returns 'words'
+foobar.pluralize('goose') # returns 'geese'
+foobar.singularize('phenomena') # returns 'phenomenon'
+```
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Please make sure to update tests as appropriate.
+## License
+[MIT](https://choosealicense.com/licenses/mit/) -->
 
-For your final project, we'll be building a Command Line database application.
 
-## Project Requirements
 
-### Option One - Data Analytics Project
 
-1. Access a Sqlite3 Database using ActiveRecord.
-2. You should have at minimum three models including one join model. This means you must have a many-to-many relationship.
-3. You should seed your database using data that you collect either from a CSV, a website by scraping, or an API.
-4. Your models should have methods that answer interesting questions about the data. For example, if you've collected info about movie reviews, what is the most popular movie? What movie has the most reviews?
-5. You should provide a CLI to display the return values of your interesting methods.  
-6. Use good OO design patterns. You should have separate classes for your models and CLI interface.
-
-  **Resource:** [Easy Access APIs](https://github.com/learn-co-curriculum/easy-access-apis)
-
-### Option Two - Command Line CRUD App
-
-1. Access a Sqlite3 Database using ActiveRecord.
-2. You should have a minimum of three models.
-3. You should build out a CLI to give your user full CRUD ability for at least one of your resources. For example, build out a command line To-Do list. A user should be able to create a new to-do, see all todos, update a todo item, and delete a todo. Todos can be grouped into categories, so that a to-do has many categories and categories have many to-dos.
-4. Use good OO design patterns. You should have separate classes for your models and CLI interface.
-
-### Brainstorming and Proposing a Project Idea
-
-Projects need to be approved prior to launching into them, so take some time to brainstorm project options that will fulfill the requirements above.  You must have a minimum of four [user stories](https://en.wikipedia.org/wiki/User_story) to help explain how a user will interact with your app.  A user story should follow the general structure of `"As a <role>, I want <goal/desire> so that <benefit>"`. For example, if we were creating an app to randomly choose nearby restaurants on Yelp, we might write:
-
-* As a user, I want to be able to enter my name to retrieve my records
-* As a user, I want to enter a location and be given a random nearby restaurant suggestion
-* As a user, I should be able to reject a suggestion and not see that restaurant suggestion again
-* As a user, I want to be able to save to and retrieve a list of favorite restaurant suggestions
-
-## Instructions
+<!-- ## Instructions
 
 1. Fork and clone this repository.
 2. Build your application. Make sure to commit early and commit often. Commit messages should be meaningful (clearly describe what you're doing in the commit) and accurate (there should be nothing in the commit that doesn't match the description in the commit message). Good rule of thumb is to commit every 3-7 mins of actual coding time. Most of your commits should have under 15 lines of code and a 2 line commit is perfectly acceptable.
@@ -56,4 +45,4 @@ Projects need to be approved prior to launching into them, so take some time to 
 ```ruby
 # in config/environment.rb add this line:
 ActiveRecord::Base.logger = nil
-```
+``` -->
