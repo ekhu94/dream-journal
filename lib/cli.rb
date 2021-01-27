@@ -4,10 +4,8 @@ class CLI
         @users = []
     end
 
-    def welcome
-        puts "*--*--*--*--*-*-*--*--*--*--*"
-        puts "Welcome to the Dream Journal."
-        puts "*--*--*--*--*-*-*--*--*--*--*"
+    def user
+        @users[0]
     end
 
     def log_in
@@ -19,10 +17,6 @@ class CLI
         @users << curr_user
         puts
         puts "Welcome #{self.user.name}."
-    end
-
-    def user
-        @users[0]
     end
 
     def find_or_create_by_name(name)
@@ -51,44 +45,47 @@ class CLI
         end
     end
 
-    def main_menu
-        puts
-        puts "What would you like to do?"
-        puts "*--*--*--*--*--*--*--*--*--*--*"
-        puts "[new] Make a new dream entry"
-        puts "[list] List past entries"
-        puts "[update] Update a dream entry"
-        puts "[delete] Delete dream entry"
-        puts "[exit] Exit program"
-        puts "*--*--*--*--*--*--*--*--*--*--*"
-        puts
-    end
+    # NEW ENTRY METHODS AND PARAM-SETTERS
 
-    def category_menu
-        puts
-        puts "*--*--*--*--*--*--*--*"
-        puts "[1] Normal Dream"
-        puts "[2] Nightmare"
-        puts "[3] Lucid Dream"
-        puts "[4] False Awakening"
-        puts "*--*--*--*--*--*--*--*"
-        puts
-    end
+    def create_entry
+        dream_params = {}
+        dream_params[:hours_slept] = hours_slept?
+        dream_params[:user_id] = self.user.id
+        new_dream = Dream.create(dream_params)
 
-    def print_entry_num(i)
-    num = ""
-        case i
-        when 1
-            num = "1st"
-        when 2
-            num = "2nd"
-        when 3
-            num = "3rd"
-        else
-            num = i.to_s + "th"
+        num = num_entries
+        i = 0
+        while i < num do
+            entry_params = {}
+            entry_params[:date] = DateTime.now
+            entry_params[:category] = select_category(i + 1)
+            entry_params[:remembrance] = get_remembrance
+            entry_params[:description] = get_description
+            entry_params[:recurring] = recurring?
+            entry_params[:dream_id] = new_dream.id
+            new_entry = Entry.create(entry_params)
+            i += 1
         end
+        self.user.save
         puts
-        puts "Select a category for the #{num} entry:"
+        puts "Thank you! Your entry has been successfully saved."
+        puts
+    end
+
+    def hours_slept?
+        loop do
+            puts "How many hours did you sleep?"
+            hours = gets.chomp
+            return hours.to_i
+        end
+    end
+
+    def num_entries
+        loop do
+            puts "How many separate instances do you remember in this dream?"
+            num = gets.chomp
+            return num.to_i if /\A\d+\z/.match(num)
+        end
     end
 
     def select_category(i=nil)
@@ -131,14 +128,6 @@ class CLI
         story
     end
 
-    def hours_slept?
-        loop do
-            puts "How many hours did you sleep?"
-            hours = gets.chomp
-            return hours.to_i
-        end
-    end
-
     def recurring?
         loop do
             puts "Is this a recurring dream?"
@@ -154,53 +143,57 @@ class CLI
         end
     end
 
-    def num_entries
+    # END OF NEW ENTRY METHODS AND PARAM-SETTERS
+
+    # LIST AND READER METHODS
+
+    def select_list
         loop do
-            puts "How many separate instances do you remember in this dream?"
-            num = gets.chomp
-            return num.to_i if /\A\d+\z/.match(num)
+            if self.user.entries.length == 0
+                puts
+                puts "You have no entries yet!"
+                puts
+                break
+            end
+            list_menu
+            choice = gets.chomp
+            case choice
+            when "a"
+                print_dreams(self.user.dreams)
+                break
+            when "1"
+                picked_category = select_category
+                entries = self.user.entries.where(category: picked_category)
+                print_dreams(self.user.dreams, entries)
+                break
+            when "2"
+                entries = self.user.entries.where(recurring: true)
+                print_dreams(self.user.dreams, entries)
+                break
+            when "3"
+                
+            when "4"
+                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 5, 0)
+                print_dreams(dreams_arr)
+                break
+            when "5"
+                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 20, 5)
+                print_dreams(dreams_arr)
+                break
+            when "q"
+                break
+            end
         end
     end
 
-    def create_entry
-        dream_params = {}
-        dream_params[:hours_slept] = hours_slept?
-        dream_params[:user_id] = self.user.id
-        new_dream = Dream.create(dream_params)
+    # def get_entries_by_hours_slept(min, max=100)
+    #     dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", max, min)
+    #     dreams_arr.map { |dream| dream.entries }.flatten
+    # end
 
-        num = num_entries
-        i = 0
-        while i < num do
-            entry_params = {}
-            entry_params[:date] = DateTime.now
-            entry_params[:category] = select_category(i + 1)
-            entry_params[:remembrance] = get_remembrance
-            entry_params[:description] = get_description
-            entry_params[:recurring] = recurring?
-            entry_params[:dream_id] = new_dream.id
-            new_entry = Entry.create(entry_params)
-            i += 1
-        end
-        self.user.save
-        puts
-        puts "Thank you! Your entry has been successfully saved."
-        puts
-    end
+    # END OF LIST AND READER METHODS
 
-    def list_menu
-        puts
-        puts "List which entries?"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts "[a] All dreams"
-        puts "[1] By category"
-        puts "[2] Recurring" 
-        puts "[3] By date" #todo
-        puts "[4] Had minimal sleep"
-        puts "[5] Had sufficient sleep"
-        puts "[q] Back to main menu"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts
-    end
+    # UPDATE METHODS
 
     def update_entry
         update_menu
@@ -220,18 +213,6 @@ class CLI
                 choice = gets.chomp
             end
         end
-    end
-
-    def find_by_entry(dream)
-        print_entries(dream.entries)
-        puts
-        puts "Type in the ID of the Entry you would like to update"
-        selected_id = gets.chomp
-        while !/\A\d+\z/.match(selected_id) || !dream.entries.find_by(id: selected_id.to_i)
-            puts "Please enter a valid Entry ID"
-            selected_id = gets.chomp
-        end
-        dream.entries.find_by(id: selected_id.to_i)
     end
 
     def update_by_id
@@ -358,40 +339,37 @@ class CLI
         end   
     end
 
-    def update_menu
+    def find_by_entry(dream)
+        print_entries(dream.entries)
         puts
-        puts "Select a method for updating"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts "[id] By ID number"
-        puts "[all] All entries"
-        puts "[q] Back to main menu"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts
+        puts "Type in the ID of the Entry you would like to update"
+        selected_id = gets.chomp
+        while !/\A\d+\z/.match(selected_id) || !dream.entries.find_by(id: selected_id.to_i)
+            puts "Please enter a valid Entry ID"
+            selected_id = gets.chomp
+        end
+        dream.entries.find_by(id: selected_id.to_i)
     end
 
-    def attr_menu
-        puts
-        puts "What attribute would \nyou like to change?"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts "[1] Category"
-        puts "[2] Remembrance"
-        puts "[3] Description"
-        puts "[4] Recurring"
-        puts "[5] Hours slept"
-        puts "[q] Back to main menu"
-        puts "*--*--*--*--*--*--*--*--*"
-        puts
-    end
+    # END OF UPDATE METHODS
 
-    def delete_menu
-        puts
-        puts "Select a method for deleting"
-        puts "*--*--*--*--*--*--*--*--*--*"
-        puts "[id] By dream ID"
-        puts "[all] All dreams"
-        puts "[q] Back to main menu"
-        puts "*--*--*--*--*--*--*--*--*--*"
-        puts
+    # DELETE METHODS
+
+    def delete_entry
+        delete_menu
+        choice = gets.chomp
+        loop do
+            case choice
+            when "id"
+                delete_by_id
+                break
+            when "all"
+                delete_by_all
+                break
+            when "q"
+                break
+            end
+        end
     end
 
     def delete_by_id
@@ -410,6 +388,7 @@ class CLI
             case confirm
             when "yes", "y"
                 self.user.dreams.destroy_by(id: selected_id.to_i)
+                puts
                 puts "Dream ##{selected_id.to_i} has been deleted!"
                 self.user.save
                 break
@@ -427,6 +406,7 @@ class CLI
             case confirm
             when "yes", "y"
                 Entry.destroy_by(user_id: self.user.id)
+                puts
                 puts "All of #{self.user.name}'s entries have been deleted!"
                 self.user.save
                 break
@@ -436,22 +416,9 @@ class CLI
         end
     end
 
-    def delete_entry
-        delete_menu
-        choice = gets.chomp
-        loop do
-            case choice
-            when "id"
-                delete_by_id
-                break
-            when "all"
-                delete_by_all
-                break
-            when "q"
-                break
-            end
-        end
-    end
+    # END OF DELETE METHODS
+
+    # PRINT METHODS
 
     def print_dreams(dreams, entries=nil)
         puts
@@ -492,47 +459,107 @@ class CLI
         end
     end
 
-    def get_entries_by_hours_slept(min, max=100)
-        dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", max, min)
-        dreams_arr.map { |dream| dream.entries }.flatten
+    def print_entry_num(i)
+    num = ""
+        case i
+        when 1
+            num = "1st"
+        when 2
+            num = "2nd"
+        when 3
+            num = "3rd"
+        else
+            num = i.to_s + "th"
+        end
+        puts
+        puts "Select a category for the #{num} entry:"
     end
 
-    def select_list
-        loop do
-            if self.user.entries.length == 0
-                puts
-                puts "You have no entries yet!"
-                puts
-                break
-            end
-            list_menu
-            choice = gets.chomp
-            case choice
-            when "a"
-                print_dreams(self.user.dreams)
-                break
-            when "1"
-                picked_category = select_category
-                entries = self.user.entries.where(category: picked_category)
-                print_dreams(self.user.dreams, entries)
-                break
-            when "2"
-                entries = self.user.entries.where(recurring: true)
-                print_dreams(self.user.dreams, entries)
-                break
-            when "3"
-                
-            when "4"
-                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 5, 0)
-                print_dreams(dreams_arr)
-                break
-            when "5"
-                dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 20, 5)
-                print_dreams(dreams_arr)
-                break
-            when "q"
-                break
-            end
-        end
+     # END OF PRINT METHODS
+
+     # PRINT MENUS
+
+    def welcome
+        puts "*--*--*--*--*-*-*--*--*--*--*"
+        puts "Welcome to the Dream Journal."
+        puts "*--*--*--*--*-*-*--*--*--*--*"
     end
+
+    def main_menu
+        puts
+        puts "What would you like to do?"
+        puts "*--*--*--*--*--*--*--*--*--*--*"
+        puts "[new] Make a new dream entry"
+        puts "[list] List past entries"
+        puts "[update] Update a dream entry"
+        puts "[delete] Delete dream entry"
+        puts "[exit] Exit program"
+        puts "*--*--*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def list_menu
+        puts
+        puts "List which entries?"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts "[a] All dreams"
+        puts "[1] By category"
+        puts "[2] Recurring" 
+        puts "[3] By date" #todo
+        puts "[4] Had minimal sleep"
+        puts "[5] Had sufficient sleep"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def update_menu
+        puts
+        puts "Select a method for updating"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts "[id] By ID number"
+        puts "[all] All entries"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def delete_menu
+        puts
+        puts "Select a method for deleting"
+        puts "*--*--*--*--*--*--*--*--*--*"
+        puts "[id] By dream ID"
+        puts "[all] All dreams"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def category_menu
+        puts
+        puts "*--*--*--*--*--*--*--*"
+        puts "[1] Normal Dream"
+        puts "[2] Nightmare"
+        puts "[3] Lucid Dream"
+        puts "[4] False Awakening"
+        puts "*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def attr_menu
+        puts
+        puts "What attribute would \nyou like to change?"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts "[1] Category"
+        puts "[2] Remembrance"
+        puts "[3] Description"
+        puts "[4] Recurring"
+        puts "[5] Hours slept"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    # END OF PRINT MENUS
+
 end
