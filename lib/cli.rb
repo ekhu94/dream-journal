@@ -191,19 +191,6 @@ class CLI
     #     dreams_arr.map { |dream| dream.entries }.flatten
     # end
 
-
-    # def get_entries_by_id
-    #     puts "Please enter an ID Entry number: "
-    #     ans = gets.chomp 
-    #     Entry.find(id = ans)
-    #     # dream.entries.find_by(id: )
-    #     #if entry.date is equal to answer. return entry 
-    #     # User.first.entries.where("date = ") = gives user id
-    #     #Entry.first.date = gives first date
-    #     #Entry.first = gives instance of entry 
-    #     #find by id (ans) - return list of dreams with entries that match id 
-    #  end
-
     # END OF LIST AND READER METHODS
 
     # UPDATE METHODS
