@@ -39,7 +39,7 @@ class CLI
             when "list"
                 select_list
             when "update"
-
+                update_entry
             when "delete"
                 delete_entry
             when "exit"
@@ -196,8 +196,115 @@ class CLI
         puts "[2] Recurring" 
         puts "[3] By date" #todo
         puts "[4] Had minimal sleep"
-        puts "[5] Had sufficient sleep" #todo
-        puts "[q] Back to main menu" #todo
+        puts "[5] Had sufficient sleep"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def update_entry
+        update_menu
+        choice = gets.chomp
+        loop do
+            case choice
+            when "id"
+                update_by_id
+                break
+            when "all"
+                update_by_all
+            when "q"
+                break
+            end
+        end
+    end
+
+    def find_by_entry(dream)
+        print_entries(dream.entries)
+        puts
+        puts "Type in the ID of the Entry you would like to update"
+        selected_id = gets.chomp
+        while !/\A\d+\z/.match(selected_id) || !dream.entries.find_by(id: selected_id.to_i)
+            puts "Please enter a valid Entry ID"
+            selected_id = gets.chomp
+        end
+        dream.entries.find_by(id: selected_id.to_i)
+    end
+
+    def update_by_id
+        print_dreams(self.user.dreams)
+        puts
+        puts "Type in the ID of the Dream you would like to update."
+        selected_id = gets.chomp
+        while !/\A\d+\z/.match(selected_id) || !self.user.dreams.find_by(id: selected_id.to_i)
+            puts "Please enter a valid dream ID"
+            selected_id = gets.chomp
+        end
+        dream = self.user.dreams.find_by(id: selected_id.to_i)
+        attr_menu
+        loop do
+            selected_attr = gets.chomp
+            case selected_attr
+            when "1"
+                entry = find_by_entry(dream)
+                entry[:category] = select_category
+                entry.save
+                puts
+                puts "You have successfully updated the category!"
+                break
+            when "2"
+                entry = find_by_entry(dream)
+                entry[:remembrance] = get_remembrance
+                entry.save
+                puts
+                puts "You have successfuly updated the remembrance!"
+                break
+            when "3"
+                entry = find_by_entry(dream)
+                entry[:description] = get_description
+                entry.save
+                puts
+                puts "You have successfuly updated the description!"
+                break
+            when "4"
+                entry = find_by_entry(dream)
+                entry[:recurring] = recurring?
+                entry.save
+                puts
+                puts "You have successfuly updated the recurrance!"
+                break
+            when "5"
+                dream[:hours_slept] = hours_slept?
+                dream.save
+                puts
+                puts "You have successfully update the hours slept!"
+                break
+            when "q"
+                break
+            end
+        end 
+    end
+
+    def update_menu
+        puts
+        puts "Select a method for updating"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts "[id] By ID number"
+        puts "[all] All entries"
+        puts "[q] Back to main menu"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts
+    end
+
+    def attr_menu
+        puts
+        puts "What attribute would \nyou like to change?"
+        puts "*--*--*--*--*--*--*--*--*"
+        puts "[1] Category"
+        puts "[2] Remembrance"
+        puts "[3] Description"
+        puts "[4] Recurring"
+        puts "[5] Hours slept"
+        puts "[q] Back to main menu"
         puts "*--*--*--*--*--*--*--*--*"
         puts
     end
@@ -300,6 +407,7 @@ class CLI
     def print_entries(entries)
         entries.each do |entry|
             puts
+            puts "Entry ID ##{entry[:id]}"
             puts "Date: #{entry[:date].strftime('%H:%M %B %e, %Y')}"
             puts "Type: #{entry[:category]}"
             puts "Discription: #{entry[:description]}"
