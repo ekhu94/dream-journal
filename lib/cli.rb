@@ -333,6 +333,9 @@ class CLI
                 break
             when "q"
                 break
+
+            when "5"
+                print_entries(get_entries_by_hours_slept(5, 20))
             end
         end
     end
