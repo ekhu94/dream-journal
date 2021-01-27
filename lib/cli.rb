@@ -273,15 +273,27 @@ class CLI
         end
     end
 
-    def print_dreams(dreams)
+    def print_dreams(dreams, entries=nil)
         puts
         puts "*--*--*--* DREAMS LIST *--*--*--*"
         puts
         dreams.each do |dream|
-            puts
-            puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
-            print_entries(dream.entries)
-            puts
+            if entries.nil?
+                puts
+                puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
+                print_entries(dream.entries)
+                puts
+            else
+                if entries.length != 0
+                    puts
+                    puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
+                    print_entries(entries)
+                    puts
+                else
+                    puts "No dreams were found matching that description."
+                    puts
+                end
+            end
         end
         puts "*--*--*--*--*--*--*--*--*--*--*--*"
     end
@@ -320,22 +332,25 @@ class CLI
                 break
             when "1"
                 picked_category = select_category
-                print_entries(self.user.entries.where(category: picked_category))
+                entries = self.user.entries.where(category: picked_category)
+                print_dreams(self.user.dreams, entries)
                 break
             when "2"
-                print_entries(self.user.entries.where(recurring: true))
+                entries = self.user.entries.where(recurring: true)
+                print_dreams(self.user.dreams, entries)
                 break
+            when "3"
+                
             when "4"
-                print_entries(get_entries_by_hours_slept(0, 5))
+                entries = get_entries_by_hours_slept(0, 5)
+                print_dreams(self.user.dreams, entries)
                 break
             when "5"
-                print_entries(get_entries_by_hours_slept(5))
+                entries = get_entries_by_hours_slept(5, 20)
+                print_entries(self.user.dreams, entries)
                 break
             when "q"
                 break
-
-            when "5"
-                print_entries(get_entries_by_hours_slept(5, 20))
             end
         end
     end
