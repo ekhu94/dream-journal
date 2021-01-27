@@ -212,8 +212,12 @@ class CLI
                 break
             when "all"
                 update_by_all
+                break
             when "q"
                 break
+            else
+                puts "Please choose a valid command."
+                choice = gets.chomp
             end
         end
     end
@@ -280,8 +284,78 @@ class CLI
                 break
             when "q"
                 break
+            else
+                puts "Please choose a valid command."
+                selected_attr = gets.chomp
             end
         end 
+    end
+
+    def update_by_all
+        attr_menu
+        loop do
+            selected_attr = gets.chomp
+            case selected_attr
+            when "1"
+                new_category = select_category
+                self.user.dreams.each do |dream|
+                    dream.entries.each do |entry| 
+                        entry[:category] = new_category
+                        entry.save
+                    end
+                end
+                puts
+                puts "You have successfully updated all categories!"
+                break
+            when "2"
+                new_remembrance = get_remembrance
+                self.user.dreams.each do |dream|
+                    dream.entries.each do |entry| 
+                        entry[:remembrance] = new_remembrance
+                        entry.save
+                    end
+                end
+                puts
+                puts "You have successfuly updated all remembrances!"
+                break
+            when "3"
+                new_description = get_description
+                self.user.dreams.each do |dream|
+                    dream.entries.each do |entry| 
+                        entry[:description] = new_description
+                        entry.save
+                    end
+                end
+                puts
+                puts "You have successfuly updated all descriptions!"
+                break
+            when "4"
+                new_recurrance = recurring?
+                self.user.dreams.each do |dream|
+                    dream.entries.each do |entry| 
+                        entry[:recurring] = new_recurrance
+                        entry.save
+                    end
+                end
+                puts
+                puts "You have successfuly updated the recurrance!"
+                break
+            when "5"
+                new_hours_slept = hours_slept?
+                self.user.dreams.each do |dream|
+                    dream[:hours_slept] = new_hours_slept
+                    dream.save
+                end
+                puts
+                puts "You have successfully update all hours slept!"
+                break
+            when "q"
+                break
+            else
+                puts "Please choose a valid command."
+                selected_attr = gets.chomp
+            end
+        end   
     end
 
     def update_menu
