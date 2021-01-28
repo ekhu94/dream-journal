@@ -1,24 +1,26 @@
 class CLI
 
-    attr_accessor :user
-    
     def initialize
-        @user
+        @users = []
     end
 
-    # def user
-    #     @users[0]
-    # end
+    def user
+        @users[0]
+    end
 
     def log_in
         welcome
         puts "Please enter your name:"
         puts
         name = gets.chomp
-        @user = User.find_or_create_by(name: name)
-        # @users << curr_user
+        curr_user = find_or_create_by_name(name)
+        @users << curr_user
         puts
         puts "Welcome #{self.user.name}."
+    end
+
+    def find_or_create_by_name(name)
+        User.find_by(name: name) || User.create(name: name)
     end
 
     def action
@@ -62,9 +64,9 @@ class CLI
             entry_params[:recurring] = recurring?
             entry_params[:dream_id] = new_dream.id
             new_entry = Entry.create(entry_params)
+            new_dream.save
             i += 1
         end
-        self.user.dreams << new_dream
         puts
         puts "Thank you! Your entry has been successfully saved."
         puts
@@ -147,7 +149,7 @@ class CLI
 
     def select_list
         loop do
-            if self.user.dreams.length == 0
+            if self.user.entries.length == 0
                 puts
                 puts "You have no entries yet!"
                 puts
