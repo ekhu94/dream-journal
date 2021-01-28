@@ -171,7 +171,8 @@ class CLI
                 print_dreams(self.user.dreams, entries)
                 break
             when "3"
-                entries = select_from_date
+                str_date = select_from_date
+                entries = self.user.entries.select { |entry| format_date(entry) == str_date }.uniq
                 print_dreams(self.user.dreams, entries)
                 break
             when "4"
@@ -190,22 +191,20 @@ class CLI
 
     def select_from_date
         time = []
-        print "Year: "
-        year = gets.chomp
-        puts
         print "Month: "
         month = gets.chomp
         puts
         print "Day: "
         day = gets.chomp
         puts
-        str_time = time.push(year, month, day).join("-")
-        self.user.entries.select { |entry| str_time == format_date(entry) }
+        print "Year: "
+        year = gets.chomp
+        puts
+        [year, month, day].join("-")
     end
 
     def format_date(entry)
         entry.date.strftime('%Y-%-m-%-d')
-        "2021-1-27"
     end
 
     # END OF LIST AND READER METHODS
