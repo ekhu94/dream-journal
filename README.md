@@ -15,12 +15,12 @@ Fork and clone the CLI Dream Journal App repo
 ```bash
 Run bundle install
 Run rake db:migrate
-Run  rake db:seed
+Run rake db:seed
 Run ruby bin/run.rb
 ```
 
 ## Contributing
-For major changes, please open an issue first to discuss what you would like to change.Please make sure to update tests as appropriate.
+For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

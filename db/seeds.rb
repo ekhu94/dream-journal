@@ -1,9 +1,9 @@
 Entry.delete.all
 Dream.delete.all
 User.delete.all
-
-user1 = User.new("syd")
-user2 = User.new("erik")
+#should new instances be .create or .new?
+user1 = User.new(name: "syd")
+user2 = User.new(name: "erik")
 
 dream1 = Dream.new(hours_slept: 8, user_id: 1)
 dream2 = Dream.new(hours_slept: 3, user_id: 2)
