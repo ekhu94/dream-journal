@@ -49,6 +49,7 @@ class CLI
 
     def create_entry
         dream_params = {}
+        dream_params[:date] = DateTime.now
         dream_params[:hours_slept] = hours_slept?
         dream_params[:user_id] = self.user.id
         new_dream = Dream.create(dream_params)
@@ -57,7 +58,6 @@ class CLI
         i = 0
         while i < num do
             entry_params = {}
-            entry_params[:date] = DateTime.now
             entry_params[:category] = select_category(i + 1)
             entry_params[:remembrance] = get_remembrance
             entry_params[:description] = get_description
@@ -171,8 +171,9 @@ class CLI
                 print_dreams(self.user.dreams, entries)
                 break
             when "3"
-                entries = select_from_date
-                print_dreams(self.user.dreams, entries)
+                str_date = select_from_date
+                dreams = self.user.dreams.select { |dream| format_date(dream) == str_date }.uniq
+                print_dreams(dreams)
                 break
             when "4"
                 dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 5, 0)
@@ -190,22 +191,20 @@ class CLI
 
     def select_from_date
         time = []
-        print "Year: "
-        year = gets.chomp
-        puts
         print "Month: "
         month = gets.chomp
         puts
         print "Day: "
         day = gets.chomp
         puts
-        str_time = time.push(year, month, day).join("-")
-        self.user.entries.select { |entry| str_time == format_date(entry) }
+        print "Year: "
+        year = gets.chomp
+        puts
+        [year, month, day].join("-")
     end
 
-    def format_date(entry)
-        entry.date.strftime('%Y-%-m-%-d')
-        "2021-1-27"
+    def format_date(dream)
+        dream.date.strftime('%Y-%-m-%-d')
     end
 
     # END OF LIST AND READER METHODS
@@ -443,18 +442,24 @@ class CLI
 
     def print_dreams(dreams, entries=nil)
         puts
-        puts "*--*--*--* DREAMS LIST *--*--*--*"
+        puts "*--*--*--*- DREAMS LIST -*--*--*--*"
         puts
+        if dreams.length == 0
+            puts "No dreams were found \nmatching that description."
+            puts
+        end
         dreams.each do |dream|
             if entries.nil?
                 puts
-                puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
+                puts "           Dream ID #{dream.id}           "
+                puts "*--*--* #{dream[:date].strftime('%B %e, %Y')} *--*--*"
                 print_entries(dream.entries)
                 puts
             else
                 if entries.length != 0
                     puts
-                    puts "*--*--*--* Dream ID #{dream.id} *--*--*--*"
+                    puts "           Dream ID #{dream.id}           "
+                    puts "*--*--* #{dream[:date].strftime('%B %e, %Y')} *--*--*"
                     print_entries(entries)
                     puts
                 else
@@ -471,7 +476,6 @@ class CLI
         entries.each do |entry|
             puts
             puts "Entry ID ##{entry[:id]}"
-            puts "Date: #{entry[:date].strftime('%H:%M %B %e, %Y')}"
             puts "Type: #{entry[:category]}"
             puts "Discription: #{entry[:description]}"
             puts "Recurring: #{entry[:recurring] ? "Yes" : "No"}"
@@ -527,7 +531,7 @@ class CLI
         puts "[a] All dreams"
         puts "[1] By category"
         puts "[2] Recurring" 
-        puts "[3] By date" #todo
+        puts "[3] By date"
         puts "[4] Had minimal sleep"
         puts "[5] Had sufficient sleep"
         puts "[q] Back to main menu"
