@@ -13,12 +13,12 @@
 ActiveRecord::Schema.define(version: 2021_01_27_012054) do
 
   create_table "dreams", force: :cascade do |t|
+    t.datetime "date"
     t.integer "hours_slept"
     t.integer "user_id"
   end
 
   create_table "entries", force: :cascade do |t|
-    t.datetime "date"
     t.string "category"
     t.integer "remembrance"
     t.text "description"
