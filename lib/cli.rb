@@ -171,7 +171,9 @@ class CLI
                 print_dreams(self.user.dreams, entries)
                 break
             when "3"
-                
+                entries = select_from_date
+                print_dreams(self.user.dreams, entries)
+                break
             when "4"
                 dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", 5, 0)
                 print_dreams(dreams_arr)
@@ -186,10 +188,25 @@ class CLI
         end
     end
 
-    # def get_entries_by_hours_slept(min, max=100)
-    #     dreams_arr = self.user.dreams.where("hours_slept < ? AND hours_slept >= ?", max, min)
-    #     dreams_arr.map { |dream| dream.entries }.flatten
-    # end
+    def select_from_date
+        time = []
+        print "Year: "
+        year = gets.chomp
+        puts
+        print "Month: "
+        month = gets.chomp
+        puts
+        print "Day: "
+        day = gets.chomp
+        puts
+        str_time = time.push(year, month, day).join("-")
+        self.user.entries.select { |entry| str_time == format_date(entry) }
+    end
+
+    def format_date(entry)
+        entry.date.strftime('%Y-%-m-%-d')
+        "2021-1-27"
+    end
 
     # END OF LIST AND READER METHODS
 
@@ -443,6 +460,7 @@ class CLI
                 else
                     puts "No dreams were found \nmatching that description."
                     puts
+                    break
                 end
             end
         end
