@@ -1,11 +1,7 @@
 class CLI
 
     def initialize
-        @users = []
-    end
-
-    def user
-        @users[0]
+        @user
     end
 
     def log_in
@@ -13,14 +9,9 @@ class CLI
         puts "Please enter your name:"
         puts
         name = gets.chomp
-        curr_user = find_or_create_by_name(name)
-        @users << curr_user
+        @user = User.find_or_create_by(name: name)
         puts
         puts "Welcome #{self.user.name}."
-    end
-
-    def find_or_create_by_name(name)
-        User.find_by(name: name) || User.create(name: name)
     end
 
     def action
@@ -64,9 +55,9 @@ class CLI
             entry_params[:recurring] = recurring?
             entry_params[:dream_id] = new_dream.id
             new_entry = Entry.create(entry_params)
-            new_dream.save
             i += 1
         end
+        self.user << new_dream
         puts
         puts "Thank you! Your entry has been successfully saved."
         puts
