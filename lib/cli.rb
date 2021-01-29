@@ -6,17 +6,12 @@ class CLI
         @user
     end
 
-    # def user
-    #     @users[0]
-    # end
-
     def log_in
         welcome
         puts "Please enter your name:"
         puts
         name = gets.chomp
         @user = User.find_or_create_by(name: name)
-        # @users << curr_user
         puts
         puts "Welcome #{self.user.name}."
     end
@@ -41,6 +36,11 @@ class CLI
                 exit
             end
         end
+    end
+
+    def start_app
+        log_in
+        action
     end
 
     # NEW ENTRY METHODS AND PARAM-SETTERS
